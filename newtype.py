@@ -5,8 +5,6 @@ import copy
 
 sio = socketio.Client()
 #conectarse al address
-#address = 'http://3.12.129.126:5000'
-#address = 'http://3.12.129.126:4000'
 
 address = 'http://localhost:4000'
 
