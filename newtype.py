@@ -10,9 +10,9 @@ address = 'http://localhost:4000'
 
 sio.connect(address)
 
-userName = 'Amuro'
+userName = 'toni'
 
-tournamentID = 142857
+tournamentID = 12
 
 # funcion obtenida del foro de la clase para saber el puntaje
 # se puede quitar, el get_puntaje_pred es casi lo mismo,
@@ -132,7 +132,7 @@ def simular_movimiento(test_board, movimiento):
 # En totito chino, si yo gano puntos, juego de nuevo y lo mismo para el oponente
 # por lo que es importante predecir el movimiento del enemigo cuando no estoy
 # recibiendo puntos, si recibo puntos, tengo otro movimiento.
-def mmax(posibles_movimientos, board, move_param, valor_param, miTurno, valor_estatico, arreglo_movimientos_param):
+def mmax(posibles_movimientos, board, move_param, valor_param, miTurno, valor_estatico, arreglo_movimientos_param, profundidad):
 
     # maxMove
     movement = move_param
@@ -176,12 +176,25 @@ def mmax(posibles_movimientos, board, move_param, valor_param, miTurno, valor_es
         # siginfica que ninguno de los movimientos va a generar un punto,
         # hay que preocuparse por el movimiento que puede hacer el enemigo
         # se va a utilizar recursion para predecir el movimiento el enemigo
-        if valor == valor_estatico:
+
+        if profundidad <= 0:
+            return movement, valor
+
+        if valor == valor_estatico and profundidad > 0:
             try:
-                movement, valor = mmax(posibles_movimientos, test_board, movement, valor, False, valor_estatico, arreglo_movimientos)
+                movement, valor = mmax(posibles_movimientos, test_board, movement, valor, False, valor_estatico, arreglo_movimientos, profundidad-1)
 
             except:
                 return movement, valor
+
+        
+        if valor != valor_estatico:
+            try:
+                movement, valor = mmax(posibles_movimientos, test_board, movement, valor, True, valor_estatico, arreglo_movimientos, profundidad-1)
+
+            except:
+                return movement, valor
+
 
     else:
 
@@ -233,6 +246,7 @@ def mmax(posibles_movimientos, board, move_param, valor_param, miTurno, valor_es
             if heuristica <= minValue:
                 minMove = movimiento_que_hice
                 minValue = heuristica
+
 
         return minMove, minValue
 
@@ -290,7 +304,7 @@ def ready(data):
     valor_param = get_puntaje_pred(board)
     arreglo_movimientos = []
 
-    movement, valor = mmax(posibles_movimientos, board, move_param, valor_param, True, valor_param, arreglo_movimientos)
+    movement, valor = mmax(posibles_movimientos, board, move_param, valor_param, True, valor_param, arreglo_movimientos,2)
 
     print("______________________________________________________")
     print("SE ELGIGE LA POSICION: ", movement, " con el valor: ", valor)
